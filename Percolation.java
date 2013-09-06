@@ -1,4 +1,11 @@
 public class Percolation {
+
+   private boolean[] o;
+   private int size;
+   private int topSite;
+   private int bottomSite;
+   private WeightedQuickUnionUF U;
+
    public Percolation(int N)              // create N-by-N grid, with all sites blocked
    {
        if (N <= 0) throw new java.lang.IllegalArgumentException();
@@ -9,7 +16,7 @@ public class Percolation {
        bottomSite = N*N+1;
        U = new WeightedQuickUnionUF(N*N+2);
        
-       for( int i = 0; i < N*N; i++ )
+       for (int i = 0; i < N*N; i++)
           o[i] = false;
           
    }
@@ -18,9 +25,7 @@ public class Percolation {
    {
        int x = getIndex(r,c);
        
-       if ( o[x] ) 
-           // do nothing if already open
-           return;                
+       if (o[x]) return;                  // do nothing if already open   
            
        // top neighbor
        if ((r > 1) && isOpen(r-1, c))
@@ -65,12 +70,6 @@ public class Percolation {
    {
       return U.connected(topSite, bottomSite);
    }
-   
-   private boolean[] o;
-   private int size;
-   private int topSite;
-   private int bottomSite;
-   private WeightedQuickUnionUF U;
    
    private int getIndex(int r, int c)
    {
