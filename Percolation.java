@@ -1,109 +1,82 @@
 public class Percolation {
+   public Percolation(int N)              // create N-by-N grid, with all sites blocked
+   {
+       if (N <= 0) throw new java.lang.IllegalArgumentException();
+       
+       o = new boolean[N*N];
+       size = N;
+       topSite = N*N;
+       bottomSite = N*N+1;
+       U = new WeightedQuickUnionUF(N*N+2);
+       
+       for( int i = 0; i < N*N; i++ )
+          o[i] = false;
+          
+   }
+   
+   public void open(int r, int c)         // open site (row r, column c) if it is not already
+   {
+       int x = getIndex(r,c);
+       
+       if ( o[x] ) 
+           // do nothing if already open
+           return;                
+           
+       // top neighbor
+       if ((r > 1) && isOpen(r-1, c))
+          U.union(x, getIndex(r-1,c));
+          
+       // bottom neighbor
+       if ((r < size) && isOpen(r+1,c))
+          U.union(x, getIndex(r+1,c));
+          
+       // left neighbor
+       if ((c > 1) && isOpen(r,c-1))
+          U.union(x, getIndex(r,c-1));
+          
+       // right neighbor
+       if ((c < size) && isOpen(r,c+1))
+          U.union(x, getIndex(r,c+1));
+          
+       // link to virtual top site if in first row
+       if (r == 1)
+          U.union(x, topSite);
+          
+       // link to virtual bottom site if in last row
+       if (r == size)
+          U.union(x, bottomSite);
+          
+       // mark open
+       o[x] = true;
+       
+   }
+   
+   public boolean isOpen(int r, int c)    // is site (row r, column c) open?
+   {
+      return o[getIndex(r,c)];
+   }
+   
+   public boolean isFull(int r, int c)    // is site (row r, column c) full?
+   {
+      return U.connected(topSite, getIndex(r,c));
+   }
 
-	private int[] grid;
-	private int[] size;
-	private int gridSize;
-	private int topSite;
-	private int bottomSite;
-	
-	private int getIndex(int i, int j)
-	{
-		if ((i < 1) || (i > gridSize) ||
-		    (j < 1) || (j > gridSize))
-		{
-			
-		}
-		
-		return (i-1)*gridSize + (j-1);
-	}
-	
-	private int findRoot(int i, int j)
-	{
-		int p = getIndex(i,j);
-		while( p != grid[p] )
-		{
-			grid[p] = grid[grid[p]];
-			p = grid[p];
-		}
-		return p;
-	}
-	
-	// connect sites s1 and s2.  NOTE: s1 and s2 are already valid indices into grid array
-	private void connect(int s1, int s2)
-	{
-		// TODO
-	}
-	
-	private boolean checkConnectivity(int i, int j)
-	{
-		int x = getIndex(i,j);
-		
-		// attempt to connect to 4 neighbors (connect will do nothing if neighbor is blocked)
-		// top neighbor
-		if ( i > 1 ) connect(x, getIndex(i-1,j));
-		// left neighbor
-		if ( j > 1 ) connect(x, getIndex(i,j-1));
-		// right neighbor
-		if ( j < gridSize ) connect(x, getIndex(i,j+1));
-		// bottom neighbor
-		if ( i < gridSize ) connect(x, getIndex(i+1,j));
-		
-		return (grid[x] == topSite);
-	}	
-	
-   	// create N-by-N grid, with all sites blocked
-	public Percolation(int N)
-	{
-		// grid: -1 if site is blocked; else points to site's root (points to itself if root or open but disconnected)
-		// grid has two special sites (at indices N*N and N*N+1) to hold virtual top and bottom sites, respectively
-		grid = new int[(N*N)+2];
-		size = new int[N*N];
-		
-		gridSize = N;
-		topSite = N*N;
-		bottomSite = (N*N)+1;
-		
-		for( int i = 0; i < (N*N); i++)
-		{	
-			grid[i]=-1; // -1 indicates site closed
-			size[i] = 1;
-		}
-		
-		// virtual top site open and full by default (points to top site, that it is, itself)
-		grid[topSite] = topSite;
-		
-		// virtual bottom site is open but empty: points to itself
-		grid[bottomSite] = bottomSite;
-	}
+   public boolean percolates()            // does the system percolate?
+   {
+      return U.connected(topSite, bottomSite);
+   }
    
-	// open site (row i, column j) if it is not already
-	public void open(int i, int j)
-	{
-		int x = getIndex(i,j);
-		if (grid[x] == -1)
-		{
-			grid[x] = x;
-			checkConnectivity(i,j);
-		}
-	}
+   private boolean[] o;
+   private int size;
+   private int topSite;
+   private int bottomSite;
+   private WeightedQuickUnionUF U;
    
-	// is site (row i, column j) open?
-	public boolean isOpen(int i, int j)
-	{
-		return (grid[getIndex(1,j)] != -1);
-	}
-   
-	// is site (row i, column j) full?
-	public boolean isFull(int i, int j)
-	{
-		// full if open (!= -1) and points to top site
-		return (grid[getIndex(i,j)] == topSite);
-	}
-
-	// does the system percolate?
-	public boolean percolates()
-	{
-		// percolates if virtual bottom site is connecte to virtual top site
-		return (grid[bottomSite] == topSite);
-	}
+   private int getIndex(int r, int c)
+   {
+       if ((r < 1) || (r > size) || (c < 1) || (c > size))
+          throw new java.lang.IndexOutOfBoundsException();
+       
+       return (r-1)*size + (c-1);
+   }
 }
