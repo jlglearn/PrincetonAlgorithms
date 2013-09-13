@@ -2,6 +2,7 @@ import java.util.Iterator;
 
 public class Deque<Item> implements Iterable<Item> {
 
+   private int minSize;
    private int nSize;
    private int nCount;
    private int iHead;
@@ -10,7 +11,8 @@ public class Deque<Item> implements Iterable<Item> {
 
    public Deque()                     // construct an empty deque
    {
-      nSize = 512;
+      minSize = 32;
+      nSize = minSize;
       nCount = 0;
       iHead = nSize/2;
       iTail = nSize/2;
@@ -29,11 +31,11 @@ public class Deque<Item> implements Iterable<Item> {
    
    public void addFirst(Item item)    // insert the item at the front
    {
-	  if (item == null)
-	  {
-		  throw new java.lang.NullPointerException();
-	  }
-	  
+      if (item == null)
+      {
+         throw new java.lang.NullPointerException();
+      }
+
       if (iHead == 0)
       {
          // reached the (front) end of the array, resize
@@ -46,11 +48,11 @@ public class Deque<Item> implements Iterable<Item> {
    
    public void addLast(Item item)     // insert the item at the end
    {
-	  if (item == null)
-	  {
-		  throw new java.lang.NullPointerException();
-	  }
-	  
+      if (item == null)
+      {
+         throw new java.lang.NullPointerException();
+      }
+  
       if (iTail >= nSize)
       {
          // reached the (tail) end of the array, resize
@@ -63,7 +65,7 @@ public class Deque<Item> implements Iterable<Item> {
    
    public Item removeFirst()          // delete and return the item at the front
    {
-      if ( iHead >= iTail )
+      if (iHead >= iTail)
       {
          throw new java.util.NoSuchElementException();
       }
@@ -73,7 +75,7 @@ public class Deque<Item> implements Iterable<Item> {
       iHead++;
       nCount--;
       
-      if (nCount <= (nSize/4))
+      if (((nSize/2) >= minSize) && (nCount <= (nSize/4)))
          resize(nSize / 2);
          
       return i;
@@ -81,7 +83,7 @@ public class Deque<Item> implements Iterable<Item> {
    
    public Item removeLast()           // delete and return the item at the end
    {
-      if ( iTail <= iHead )
+      if (iTail <= iHead)
       {
          throw new java.util.NoSuchElementException();
       }
@@ -90,7 +92,7 @@ public class Deque<Item> implements Iterable<Item> {
       items[iTail] = null;
       nCount--;
       
-      if (nCount <= (nSize / 4))
+      if (((nSize/2) >= minSize) && (nCount <= (nSize/4)))
          resize(nSize / 2);
          
       return i;
@@ -108,15 +110,15 @@ public class Deque<Item> implements Iterable<Item> {
       public boolean hasNext() { return current < nCount; }
       public Item next() 
       { 
-	     if (current >= nCount)
-	        throw new java.util.NoSuchElementException();
-	        
-	     int i = iHead + current;
-	     current++;
-	     
-	     return items[i]; 
-	  }
-	  
+         if (current >= nCount)
+            throw new java.util.NoSuchElementException();
+ 
+         int i = iHead + current;
+         current++;
+
+         return items[i]; 
+   }
+   
       public void remove() { throw new java.lang.UnsupportedOperationException(); }
    }
    
@@ -127,10 +129,10 @@ public class Deque<Item> implements Iterable<Item> {
       
       newHead = (newSize-nCount)/2;
       
-      for (i = newHead, j = iHead; i < newHead + nCount; i++, j++ )
+      for (i = newHead, j = iHead; i < newHead + nCount; i++, j++)
       {
-	      newArray[i] = items[j];
-	      items[j] = null;
+         newArray[i] = items[j];
+         items[j] = null;
       }
       
       iHead = newHead;
