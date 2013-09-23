@@ -1,144 +1,124 @@
 import java.util.Iterator;
 
-public class Deque<Item> implements Iterable<Item> {
-
-   private int minSize;
-   private int nSize;
-   private int nCount;
+public class Deque<Item> implements Iterable<Item>  {
+ 
    private int iHead;
    private int iTail;
+   private int cElements;
+   private int nSize;
    private Item[] items;
 
+   private class DequeIterator implements Iterator<Item>
+   {
+       public int current = iHead;
+       public boolean hasNext() { return current < iTail; }
+       public Item next() 
+       {
+           if ( current >= iTail )
+           {
+               throw new java.lang.IndexOutOfBoundsException();
+           }
+           
+           Item i = items[current++];
+           return i;
+       }
+       public void remove() { }
+   }
+   
    public Deque()                     // construct an empty deque
    {
-      minSize = 32;
-      nSize = minSize;
-      nCount = 0;
-      iHead = nSize/2;
-      iTail = nSize/2;
-      items = (Item[]) new Object[nSize];
+       nSize = 512;
+       iHead = nSize / 2;
+       iTail = nSize / 2;
+       cElements = 0;
+       items = (Item[]) new Object[nSize];
+   }
+   
+   public Iterator<Item> iterator()
+   {
+      return new DequeIterator();
    }
    
    public boolean isEmpty()           // is the deque empty?
    {
-      return (nCount == 0);
+      return cElements == 0;
    }
    
    public int size()                  // return the number of items on the deque
    {
-      return nCount;
+      return cElements;
    }
    
    public void addFirst(Item item)    // insert the item at the front
    {
-      if (item == null)
-      {
-         throw new java.lang.NullPointerException();
-      }
-
-      if (iHead == 0)
-      {
-         // reached the (front) end of the array, resize
-         resize(nSize*2);
-      }
-      
-      items[--iHead] = item;
-      nCount++;
+       if (iHead == 0)
+       {
+           // reached the (head) end of the array, resize
+           resize(cElements * 2);
+       }
+       
+       items[--iHead] = item;
+       cElements++;
    }
    
    public void addLast(Item item)     // insert the item at the end
    {
-      if (item == null)
-      {
-         throw new java.lang.NullPointerException();
-      }
-  
-      if (iTail >= nSize)
-      {
-         // reached the (tail) end of the array, resize
-         resize(nSize*2);
-      }
-      
-      items[iTail++] = item;
-      nCount++;
+       if (iTail >= nSize )
+       {
+           // reached the (tail) end of the array, resize
+           resize(cElements * 2);
+       }
+       
+       items[iTail++] = item;
+       cElements++;
    }
    
    public Item removeFirst()          // delete and return the item at the front
    {
-      if (iHead >= iTail)
-      {
-         throw new java.util.NoSuchElementException();
-      }
-      
-      Item i = items[iHead];
-      items[iHead] = null;
-      iHead++;
-      nCount--;
-      
-      if (((nSize/2) >= minSize) && (nCount <= (nSize/4)))
-         resize(nSize / 2);
-         
-      return i;
+       if ( iHead >= iTail )
+       {
+            throw new java.lang.IndexOutOfBoundsException();
+       }
+       
+       Item i = items[iHead];
+       items[iHead++] = null;
+       cElements--;
+       return i;
    }
    
    public Item removeLast()           // delete and return the item at the end
    {
-      if (iTail <= iHead)
-      {
-         throw new java.util.NoSuchElementException();
-      }
-      
-      Item i = items[--iTail];
-      items[iTail] = null;
-      nCount--;
-      
-      if (((nSize/2) >= minSize) && (nCount <= (nSize/4)))
-         resize(nSize / 2);
-         
-      return i;
+       if ( iTail < iHead )
+       {
+           throw new java.lang.IndexOutOfBoundsException();
+       }
+       
+       Item i = items[--iTail];
+       items[iTail] = null;
+       cElements--;
+       return i;
    }
    
-   public Iterator<Item> iterator()   // return an iterator over items in order from front to end
+   private void resize(int newsize)
    {
-      return new MyIterator();
-   }
-   
-   private class MyIterator implements Iterator<Item>
-   {
-      private int current = 0;
-      
-      public boolean hasNext() { return current < nCount; }
-      public Item next() 
-      { 
-         if (current >= nCount)
-            throw new java.util.NoSuchElementException();
- 
-         int i = iHead + current;
-         current++;
-
-         return items[i]; 
-   }
-   
-      public void remove() { throw new java.lang.UnsupportedOperationException(); }
-   }
-   
-   private void resize(int newSize)
-   {
-      int i, j, newHead;
-      Item[] newArray = (Item[]) new Object[newSize];
-      
-      newHead = (newSize-nCount)/2;
-      
-      for (i = newHead, j = iHead; i < newHead + nCount; i++, j++)
-      {
-         newArray[i] = items[j];
-         items[j] = null;
-      }
-      
-      iHead = newHead;
-      iTail = newHead + nCount;
-      items = null;
-      items = newArray;  
-      nSize = newSize;    
+       if ( newsize < 512 )
+       {
+           newsize = 512;
+       }
+       
+       int start = (newsize - cElements) / 2;
+       
+       Item[] newItems = (Item[]) new Object[newsize];
+       
+       for (int i = 0; i < cElements; i++ )
+       {
+           newItems[i+start] = items[i+iHead];
+       }
+       
+       iHead = start;
+       iTail = iHead+cElements;
+       items = null;
+       items = newItems;
+       nSize = newsize;
    }
 }
