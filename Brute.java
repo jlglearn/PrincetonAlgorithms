@@ -10,7 +10,7 @@ public class Brute
     {
         ReadPoints();
         SortPoints(0, points.length);
-        PrintPoints();
+        //PrintPoints();
         PrepareDraw();
         DrawPoints();
         FindCollinearPoints();
