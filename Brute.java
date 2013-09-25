@@ -1,51 +1,79 @@
 public class Brute
 {
-    
     public Brute()
     {
-        public static void main(String argv[])
-        {
-        
-            ReadPoints();
-            FindCollinearPoints();
-            
-            
-        }
     }
     
-    private void ReadPoints()
+    public static void main(String argv[])
     {
-        nPoints = StdIn.readInt();
-        this.points = new Point[nPoints];
+        ReadPoints();
+        // PrintPoints();
+        PrepareDraw();
+        DrawPoints();
+        FindCollinearPoints();
+    }
+    
+    private static void PrepareDraw()
+    {
+        StdDraw.setXscale(0, 32768);
+        StdDraw.setYscale(0, 32768);
+    }
+    
+    
+    private static void ReadPoints()
+    {
+        int nPoints = StdIn.readInt();
+        points = new Point[nPoints];
         
         for (int i = 0; i < nPoints; i++)
         {
             int x = StdIn.readInt();
             int y = StdIn.readInt();
             
-            this.points[i] = new Point(x, y);
+            points[i] = new Point(x, y);
         }    
+        
+        SortPoints(0, points.length);
     }
     
-    private void FindCollinearPoints()
+    private static void PrintPoints()
     {
-        Point p[4];
-        
-        for (int p0 = 0; p0 < this.points.length - 3; p0++)
+        StdOut.println("Read " + points.length + " points:");
+        for (int i = 0; i < points.length; i++)
         {
-            p[0] = p0;
-            for (int p1 = p0; p1 < this.points.length - 2; p1++)
+            StdOut.println("[" + i + "]:" + points[i]);
+        }
+    }
+    
+    private static void DrawPoints()
+    {
+        for (int i = 0; i < points.length; i++)
+        {
+            points[i].draw();
+        }
+    }
+    
+    private static void FindCollinearPoints()
+    {        
+        for (int p0 = 0; p0 < points.length - 3; p0++)
+        {
+            
+            for (int p1 = p0+1; p1 < points.length - 2; p1++)
             {
-                p[1] = p1;
-                for (int p2 = p1; p2 < this.points.length -1; p2++)
+                for (int p2 = p1+1; p2 < points.length -1; p2++)
                 {
-                    p[2] = p2;
-                    for (int p3 = p2; p3 < this.points.length; p3++)
+                    for (int p3 = p2+1; p3 < points.length; p3++)
                     {
-                        p[3] = p3;
-                        if (areCollinear(p))
+                        if (areCollinear(points[p0], points[p1], points[p2], points[p3]))
                         {
-                            SortPoints(p, 0, p.length);
+                            StdOut.println(points[p0] + " -> " + 
+                                           points[p1] + " -> " + 
+                                           points[p2] + " -> " + 
+                                           points[p3]);
+                                           
+                            points[p0].drawTo(points[p1]);
+                            points[p1].drawTo(points[p2]);
+                            points[p2].drawTo(points[p3]);
                         }
                     }
                 }
@@ -53,24 +81,20 @@ public class Brute
         }    
     }
     
-    private boolean areCollinear(Point[] p)
+    private static boolean areCollinear(Point p0, Point p1, Point p2, Point p3)
     {
-        double previousSlope, thisSlope;
-        
-        for (i = 0; i < p.length-1; i++)
-        {
-            thisSlope = p[i].slopeTo(p[i+1]);
-
-            if ((i > 0) && (thisSlope != previousSlope))
-                return false;
-                
-            previousSlope = thisSlope;
-        }
-        
-        return true;
+        double slope2 = p1.slopeTo(p2);
+        return (p0.slopeTo(p1) == slope2) && (slope2 == p2.slopeTo(p3));
     }
     
-    private void SortPoints(Point[] a, int start, int end)
+    public static void Swap(int i, int j)
+    {
+        Point t = points[i];
+        points[i] = points[j];
+        points[j] = t;
+    }
+            
+    private static void SortPoints(int start, int end)
     {
         int n = end - start;
         if (n > 2)
@@ -81,23 +105,23 @@ public class Brute
 
             while (i < gt)
             {
-                int r = p[start].compareTo(p[i]);
-                if (r < 0) Swap(a, eq++, i++);
-                else if (r > 0) Swap(a, --gt, i);
+                int r = points[i].compareTo(points[start]);
+                if (r > 0) Swap(eq++, i++);
+                else if (r < 0) Swap(--gt, i);
                 else i++;
             }
             
-            SortPoints(a, start, eq);
-            SortPoints(a, gt, end);
+            SortPoints(start, eq);
+            SortPoints(gt, end);
         }
         if (n == 2)
         {
-            if (a[start].compareTo(a[start+1]) < 0)
+            if (points[start].compareTo(points[start+1]) < 0)
             {
-                SwapPoints(a, start, start+1);
+                Swap(start, start+1);
             }
         }
     }
     
-    private Point points[];
+    private static Point points[];
 }

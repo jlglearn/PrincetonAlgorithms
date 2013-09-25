@@ -53,10 +53,10 @@ public class Point implements Comparable<Point> {
     // is this point lexicographically smaller than that one?
     // comparing y-coordinates and breaking ties by x-coordinates
     public int compareTo(Point p) {
-    if (this.y < p.y) return -1;
-    if (this.y > p.y) return 1;
-    if (this.x < p.x) return -1;
-    if (this.x > p.y) return 1;
+    if (p.y < this.y) return -1;
+    if (p.y > this.y) return 1;
+    if (p.x < this.x) return -1;
+    if (p.x > this.x) return 1;
     return 0;
     }
 
@@ -73,6 +73,7 @@ public class Point implements Comparable<Point> {
             this.x = x;
             this.y = y;
         }
+        
         public int compare(Point p, Point q)
         {
             double dxp = p.x - this.x;
