@@ -9,7 +9,7 @@ public class Brute
     public static void main(String argv[])
     {
         ReadPoints();
-        SortPoints(0, points.length);
+        SortPoints();
         //PrintPoints();
         PrepareDraw();
         DrawPoints();
@@ -88,7 +88,7 @@ public class Brute
         return (slope1 == p0.slopeTo(p2)) && (slope1 == p0.slopeTo(p3));
     }
             
-    private static void SortPoints(int start, int end)
+    private static void SortPoints()
     {
         Arrays.sort(points);
     }
