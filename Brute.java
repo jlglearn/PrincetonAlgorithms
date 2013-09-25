@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 public class Brute
 {
     public Brute()
@@ -7,7 +9,8 @@ public class Brute
     public static void main(String argv[])
     {
         ReadPoints();
-        // PrintPoints();
+        SortPoints(0, points.length);
+        PrintPoints();
         PrepareDraw();
         DrawPoints();
         FindCollinearPoints();
@@ -31,9 +34,7 @@ public class Brute
             int y = StdIn.readInt();
             
             points[i] = new Point(x, y);
-        }    
-        
-        SortPoints(0, points.length);
+        }            
     }
     
     private static void PrintPoints()
@@ -83,44 +84,13 @@ public class Brute
     
     private static boolean areCollinear(Point p0, Point p1, Point p2, Point p3)
     {
-        double slope2 = p1.slopeTo(p2);
-        return (p0.slopeTo(p1) == slope2) && (slope2 == p2.slopeTo(p3));
-    }
-    
-    public static void Swap(int i, int j)
-    {
-        Point t = points[i];
-        points[i] = points[j];
-        points[j] = t;
+        double slope1 = p0.slopeTo(p1);
+        return (slope1 == p0.slopeTo(p2)) && (slope1 == p0.slopeTo(p3));
     }
             
     private static void SortPoints(int start, int end)
     {
-        int n = end - start;
-        if (n > 2)
-        {
-            int i = start+1;
-            int eq = start;
-            int gt = end;
-
-            while (i < gt)
-            {
-                int r = points[i].compareTo(points[start]);
-                if (r > 0) Swap(eq++, i++);
-                else if (r < 0) Swap(--gt, i);
-                else i++;
-            }
-            
-            SortPoints(start, eq);
-            SortPoints(gt, end);
-        }
-        if (n == 2)
-        {
-            if (points[start].compareTo(points[start+1]) < 0)
-            {
-                Swap(start, start+1);
-            }
-        }
+        Arrays.sort(points);
     }
     
     private static Point points[];
