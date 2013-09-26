@@ -137,9 +137,7 @@ public class Fast
         }
             
         StdOut.println();
-        
-        for (int i = 0; i < p.length - 1; i++)
-            p[i].drawTo(p[i+1]);
+        p[0].drawTo(p[p.length - 1]);
     }
             
     private static void printPoints()
