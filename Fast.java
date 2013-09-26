@@ -9,6 +9,7 @@ public class Fast
     public static void main(String argv[])
     {     
         ReadPoints();
+        SortPoints();
         PrepareDraw();
         DrawPoints();
         FindCollinearPoints();
@@ -45,13 +46,18 @@ public class Fast
     
     private static void FindCollinearPoints()
     {        
-        // first create a working copy of the points
-        Point[] p = new Point[points.length];
-        for (int i = 0; i < points.length; i++)
-            p[i] = points[i];
-        
+
         for (int p0 = 0; p0 < points.length; p0++)
         {                    
+        
+            // first create a working copy of the points
+            // Note that all lines involving points with indices < than index of current point
+            // have already been processed, so we don't need to explore them anymore
+            
+            Point[] p = new Point[points.length - p0];            
+            for (int j = 0, i = p0; i < points.length; j++, i++)
+                p[j] = points[i];
+                    
             Arrays.sort(p, points[p0].SLOPE_ORDER);
             
             int i = 1;
@@ -85,7 +91,7 @@ public class Fast
                     // copy the rest of the collinear points
                     for (int j = 1, k = startCollinear; j < streak+1; j++, k++)
                         cp[j] = p[k];
-                        
+                    
                     Arrays.sort(cp);
                     PrintCollinearPoints(cp);
                 }
@@ -99,9 +105,7 @@ public class Fast
                 
                 lastSlope = slope;
             } 
-            
         }
-        
     }
     
     private static void PrintCollinearPoints(Point[] p)
@@ -115,6 +119,17 @@ public class Fast
             p[i].drawTo(p[i+1]);
     }
             
+    private static void PrintPoints()
+    {
+        StdOut.println("Read " + points.length + " points.");
+        
+        for (int i = 0; i < points.length; i++)
+        {
+            StdOut.println("[" + i + "]: " + points[i]);
+        }
+            
+    }
+    
     private static void SortPoints(Point p)
     {
         Arrays.sort(points, p.SLOPE_ORDER);
@@ -126,4 +141,5 @@ public class Fast
     }
     
     private static Point points[];
+
 }
