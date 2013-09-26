@@ -67,13 +67,10 @@ public class Fast
         for (int p0 = 0; p0 < points.length; p0++)
         {                    
         
-            // first create a working copy of the points
-            // Note that all lines involving points with indices < than index of current point
-            // have already been processed, so we don't need to explore them anymore
-            
-            Point[] p = new Point[points.length - p0];            
-            for (int j = 0, i = p0; i < points.length; j++, i++)
-                p[j] = points[i];
+            // first create a working copy of the points            
+            Point[] p = new Point[points.length];            
+            for (int i = 0; i < points.length; i++)
+                p[i] = points[i];
                     
             Arrays.sort(p, points[p0].SLOPE_ORDER);
             
@@ -111,7 +108,13 @@ public class Fast
                         cp[j] = p[k];
                     
                     Arrays.sort(cp);
-                    printCollinearPoints(cp);
+                    
+                    if ( cp[0].compareTo(points[p0]) == 0 )
+                    {
+                        // to eliminate permutations only print one instance
+                        // (that where the reference point is the start of the line)
+                        printCollinearPoints(cp);
+                    }
                 }
                 
                 if (slope != lastSlope)
