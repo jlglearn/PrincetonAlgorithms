@@ -19,7 +19,7 @@ public class Point implements Comparable<Point> {
 
     private final int x;                              // x coordinate
     private final int y;                              // y coordinate
-
+            
     // create the point (x, y)
     public Point(int x, int y) {
         /* DO NOT MODIFY */
@@ -68,6 +68,8 @@ public class Point implements Comparable<Point> {
     
     private static class BySlopeOrder implements Comparator<Point>
     {
+        private final Point point;
+        
         public BySlopeOrder(Point p)
         {
             this.point = p;
@@ -83,7 +85,6 @@ public class Point implements Comparable<Point> {
             return 0;
         }
         
-        private final Point point;
     }
 
     // unit test

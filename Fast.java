@@ -2,27 +2,45 @@ import java.util.Arrays;
 
 public class Fast
 {
+    private static Point[] points;
+    
     public Fast()
     {
     }
     
-    public static void main(String argv[])
-    {     
-        ReadPoints();
-        SortPoints();
-        PrepareDraw();
-        DrawPoints();
-        FindCollinearPoints();
+    public static void main(String[] argv)
+    {
+        if (argv.length == 0) readPoints();
+        else readPoints(argv[0]);
+            
+        sortPoints();
+        prepareDraw();
+        drawPoints();
+        findCollinearPoints();
     }
     
-    private static void PrepareDraw()
+    private static void prepareDraw()
     {
         StdDraw.setXscale(0, 32768);
         StdDraw.setYscale(0, 32768);
     }
     
     
-    private static void ReadPoints()
+    private static void readPoints(String filename)
+    {
+        In inStream = new In(filename);
+        int nPoints = inStream.readInt();
+        points = new Point[nPoints];
+        
+        for (int i = 0; i < nPoints; i++)
+        {
+            int x = inStream.readInt();
+            int y = inStream.readInt();
+            points[i] = new Point(x, y);
+        } 
+    }
+    
+    private static void readPoints()
     {
         int nPoints = StdIn.readInt();
         points = new Point[nPoints];
@@ -31,12 +49,11 @@ public class Fast
         {
             int x = StdIn.readInt();
             int y = StdIn.readInt();
-            
             points[i] = new Point(x, y);
         }            
     }
     
-    private static void DrawPoints()
+    private static void drawPoints()
     {
         for (int i = 0; i < points.length; i++)
         {
@@ -44,7 +61,7 @@ public class Fast
         }
     }
     
-    private static void FindCollinearPoints()
+    private static void findCollinearPoints()
     {        
 
         for (int p0 = 0; p0 < points.length; p0++)
@@ -72,16 +89,17 @@ public class Fast
             
             double lastSlope = -1 * Double.POSITIVE_INFINITY;
             int streak = 1;
+            int startCollinear = i;
             
-            for (int startCollinear = i; i < p.length; i++)
+            for ( ; i < p.length; i++)
             {
                 double slope = p[0].slopeTo(p[i]);
                 
                 if (slope == lastSlope)
                     streak++;
                 
-                if ((streak >= 3) &&
-                    ((i == p.length-1) || (slope != lastSlope)))
+                if ((streak >= 3)
+                    && ((i == p.length-1) || (slope != lastSlope)))
                 {
                     Point[] cp = new Point[streak+1];
                     
@@ -93,7 +111,7 @@ public class Fast
                         cp[j] = p[k];
                     
                     Arrays.sort(cp);
-                    PrintCollinearPoints(cp);
+                    printCollinearPoints(cp);
                 }
                 
                 if (slope != lastSlope)
@@ -108,10 +126,15 @@ public class Fast
         }
     }
     
-    private static void PrintCollinearPoints(Point[] p)
+    private static void printCollinearPoints(Point[] p)
     {
         for (int i = 0; i < p.length; i++)
-            StdOut.print(((i > 0) ? " -> " : "") + p[i]);
+        {
+            String s = " -> ";
+            if (i == 0) s = "";
+            
+            StdOut.print(s + p[i]);
+        }
             
         StdOut.println();
         
@@ -119,7 +142,7 @@ public class Fast
             p[i].drawTo(p[i+1]);
     }
             
-    private static void PrintPoints()
+    private static void printPoints()
     {
         StdOut.println("Read " + points.length + " points.");
         
@@ -130,16 +153,14 @@ public class Fast
             
     }
     
-    private static void SortPoints(Point p)
+    private static void sortPoints(Point p)
     {
         Arrays.sort(points, p.SLOPE_ORDER);
     }
     
-    private static void SortPoints()
+    private static void sortPoints()
     {
         Arrays.sort(points);
     }
-    
-    private static Point points[];
 
 }
