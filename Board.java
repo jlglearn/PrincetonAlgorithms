@@ -21,6 +21,71 @@ public class Board
         }
     }
     
+    public int dimension()
+    {   return dim; }
+    
+    public boolean isGoal()
+    {   return manhattan() == 0; }
+    
+    public Board twin()
+    {
+        int[][] blocks = new int[dim][dim];
+        for (int i = 0; i < dim; i++)
+            for (int j = 0; j < dim; j++)
+                blocks[i][j] = board[i][j];
+
+        int row = (int) ((double)dim * Math.random());
+        int col = 0;
+                
+        while (true)
+        {
+            if (blocks[row][col] == 0) col++;
+            if (col + 1 < dim) break;
+            row = ++row % dim;
+        }
+        
+        int t = blocks[row][col];
+        blocks[row][col] = blocks[row][col+1];
+        blocks[row][col+1] = t;
+        
+        Board B = new Board(blocks);
+        return B;
+    }
+    
+    public boolean equals(Object B)
+    {
+        if (B == this) return true;
+        if (B == null) return false;
+        if (B.getClass() != this.getClass()) return false;
+        Board that = (Board) B;
+        if (dim != that.dim) return false;
+        for (int i = 0; i < dim; i++)
+            for (int j = 0; j < dim; j++)
+                if (board[i][j] != that.board[i][j])
+                    return false;
+        return true;
+    }
+    /*
+    public Iterable<Board> neighbors()
+    {
+    }
+    */
+    public String toString()
+    {
+        String s;
+        s = "" + dim + "\n";
+        for (int i = 0; i < dim; i++)
+        {
+            for (int j = 0; j < dim; j++)
+            {
+                if (j > 0) s = s + "  ";
+                s = s + board[i][j];
+                if ((j % dim) == (dim - 1)) s = s + "\n";
+            }
+        }
+        return s;
+    }
+    
     public int manhattan()
     {
         int d = 0;
@@ -93,6 +158,7 @@ public class Board
         }
         
         Board B = new Board(board);
+        StdOut.println(B);
         StdOut.println("Manhattan() = " + B.manhattan());
         
     }
