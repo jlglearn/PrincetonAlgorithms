@@ -1,5 +1,6 @@
 public class Board
 {
+    private int brow, bcol;
     private int dim;
     private int[][] board;
     
@@ -17,6 +18,13 @@ public class Board
             {
                 assert((blocks[i][j] >= 0) && (blocks[i][j] < dim2));
                 board[i][j] = blocks[i][j];
+                if (blocks[i][j] == 0)
+                {
+                    brow = i;
+                    bcol = j;
+                }
+                
+              
             }
         }
     }
@@ -26,6 +34,12 @@ public class Board
     
     public boolean isGoal()
     {   return manhattan() == 0; }
+    
+    public int blankRow() 
+    {   return brow; }
+    
+    public int blankCol()
+    {   return bcol; }
     
     public Board twin()
     {
@@ -65,11 +79,12 @@ public class Board
                     return false;
         return true;
     }
-    /*
+    
     public Iterable<Board> neighbors()
     {
+        return new MyNeighborsIterator(B);
     }
-    */
+    
     public String toString()
     {
         String s;
@@ -95,6 +110,52 @@ public class Board
             
         return d;
     }
+    public int copy()
+    {
+        int blocks[][] = new int[dim][dim];
+        for (int i = 0; i < dim; i++)
+            for (int j = 0; j < dim; j++)
+                blocks[i][j] = board[i][j];
+        Board newBoard = new Board(blocks);
+        blocks = null;
+        return newBoard;
+    }
+    
+    private void swapUp()
+    {
+        if (brow == 0) throw new java.lang.IllegalArgumentException();
+        int t = board[brow - 1][bcol];
+        board[brow - 1][bcol] = 0;
+        board[brow][bcol] = t;
+        brow--;
+    }
+    
+    private void swapDown()
+    {
+        if (brow >= (dim - 1)) throw new java.lang.IllegalArgumentException();
+        int t = board[brow + 1][bcol];
+        board[brow + 1][bcol] = 0;
+        board[brow][bcol] = t;
+        brow++;
+    }
+    
+    private void swapLeft()
+    {
+        if (bcol == 0) throw new java.lang.IllegalArgumentException();
+        int t = board[brow][bcol - 1];
+        board[brow][bcol - 1] = 0;
+        board[brow][bcol] = t;
+        bcol--;
+    }
+    
+    private void swapRight()
+    {
+        if (bcol >= (dim - 1)) throw new java.lang.IllegalArgumentException();
+        int t = board[brow][bcol + 1];
+        board[brow][bcol + 1] = 0;
+        board[brow][bcol] = t;
+        brow++;
+    }
     
     private int mdistance(int row, int col)
     {
@@ -104,6 +165,74 @@ public class Board
         {   return 0;   }
                     
         return Math.abs(((x - 1) / dim) - row) + Math.abs(((x - 1) % dim) - col);
+    }
+    
+    static class MyNeighborsIterator(Board B) implements Iterator<Board>
+    {
+        private Board B;
+        private int i, n;
+        
+        public MyNeighborsIterator(Board B)
+        {
+            i = 0;
+            n = 4;
+            if (B.blankRow == 0) n--;
+            if (B.blankRow == (B.dimension() - 1)) n--;
+            if (B.blankCol == 0) n--;
+            if (B.blankCol == (B.dimension() - 1)) n--;
+            this.B = B;
+        }
+        
+        public boolean hasNext()
+        {   return i < n;   }
+        
+        public void remove()
+        {}
+        
+        public Board next()
+        {
+            if (i >= n) throw new java.lang.NoSuchElementException();
+            
+            Board newBoard = B.copy();
+            
+            switch(i)
+            {
+                case 0: // swap up
+                    if (newBoard.blankRow() > 0)
+                    {
+                        newBoard.swapUp();
+                        break;
+                    }
+                    // fall through
+                case 1:
+                    if (newBoard.blankRow() < newBoard.dimension() - 1)
+                    {
+                        newBoard.swapDown();
+                        break;
+                    }
+                    // fall through
+                case 2:
+                    if (newBoard.blankCol() > 0)
+                    {
+                        newBoard.swapLeft();
+                        break;
+                    }
+                    // fall through
+                case 3:
+                    if (newBoard.blankCol() < newBoard.dimension() - 1)
+                    {
+                        newBoard.swapRight();
+                        break;
+                    }
+                    // fall through
+                default:
+                    newBoard = null;
+                    throw new java.lang.NoSuchElementException();
+            }
+            
+            i++;
+            return newBoard;
+        }
     }
     
     public static void main(String[] argv)
