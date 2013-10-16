@@ -1,3 +1,5 @@
+import java.util.Iterator;
+
 public class Board
 {
     private int brow, bcol;
@@ -80,9 +82,9 @@ public class Board
         return true;
     }
     
-    public Iterable<Board> neighbors()
+    public Iterator<Board> neighbors()
     {
-        return new MyNeighborsIterator(B);
+        return new MyNeighborsIterator(this);
     }
     
     public String toString()
@@ -110,7 +112,7 @@ public class Board
             
         return d;
     }
-    public int copy()
+    public Board copy()
     {
         int blocks[][] = new int[dim][dim];
         for (int i = 0; i < dim; i++)
@@ -167,20 +169,20 @@ public class Board
         return Math.abs(((x - 1) / dim) - row) + Math.abs(((x - 1) % dim) - col);
     }
     
-    static class MyNeighborsIterator(Board B) implements Iterator<Board>
+    static class MyNeighborsIterator implements Iterator<Board>
     {
         private Board B;
         private int i, n;
         
-        public MyNeighborsIterator(Board B)
+        public MyNeighborsIterator(Board srcBoard)
         {
             i = 0;
             n = 4;
-            if (B.blankRow == 0) n--;
-            if (B.blankRow == (B.dimension() - 1)) n--;
-            if (B.blankCol == 0) n--;
-            if (B.blankCol == (B.dimension() - 1)) n--;
-            this.B = B;
+            if (srcBoard.blankRow() == 0) n--;
+            if (srcBoard.blankRow() == (srcBoard.dimension() - 1)) n--;
+            if (srcBoard.blankCol() == 0) n--;
+            if (srcBoard.blankCol() == (srcBoard.dimension() - 1)) n--;
+            this.B = srcBoard;
         }
         
         public boolean hasNext()
@@ -191,7 +193,7 @@ public class Board
         
         public Board next()
         {
-            if (i >= n) throw new java.lang.NoSuchElementException();
+            if (i >= n) throw new java.lang.IndexOutOfBoundsException();
             
             Board newBoard = B.copy();
             
@@ -227,7 +229,7 @@ public class Board
                     // fall through
                 default:
                     newBoard = null;
-                    throw new java.lang.NoSuchElementException();
+                    throw new java.lang.IndexOutOfBoundsException();
             }
             
             i++;
